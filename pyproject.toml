@@ -7,6 +7,7 @@ name = "f5-tts"
 version = "1.1.15"
 description = "F5-TTS: A Fairytaler that Fakes Fluent and Faithful Speech with Flow Matching"
 readme = "README.md"
+requires-python = "==3.10.19"
 license = {text = "MIT License"}
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -15,7 +16,6 @@ classifiers = [
 ]
 dependencies = [
     "accelerate>=0.33.0",
-    "bitsandbytes>0.37.0; platform_machine!='arm64' and platform_system!='Darwin'",
     "cached_path",
     "click",
     "datasets",
@@ -32,9 +32,8 @@ dependencies = [
     "safetensors",
     "soundfile",
     "tomli",
-    "torch>=2.0.0",
-    "torchaudio>=2.0.0",
-    "torchcodec",
+    "torch==2.1.0",
+    "torchaudio==2.1.0",
     "torchdiffeq",
     "tqdm>=4.65.0",
     "transformers",
@@ -43,6 +42,10 @@ dependencies = [
     "vocos",
     "wandb",
     "x_transformers>=1.31.14",
+    "pyarrow<16",
+    "pyaudio>=0.2.14",
+    "fastapi>=0.128.2",
+    "uvicorn[standard]>=0.40.0",
 ]
 
 [project.optional-dependencies]
@@ -63,3 +66,23 @@ Homepage = "https://github.com/SWivid/F5-TTS"
 "f5-tts_infer-gradio" = "f5_tts.infer.infer_gradio:main"
 "f5-tts_finetune-cli" = "f5_tts.train.finetune_cli:main"
 "f5-tts_finetune-gradio" = "f5_tts.train.finetune_gradio:main"
+
+[tool.uv.sources]
+torch = { url = "https://github.com/acarfi-fai/Jetson-Torch-Wheels/releases/download/v0.1/torch-2.1.0+git7bcf7da-cp310-cp310-linux_aarch64.whl" }
+torchaudio = {url = "https://github.com/acarfi-fai/Jetson-Torch-Wheels/releases/download/v0.1/torchaudio-2.1.0+6ea1133-cp310-cp310-linux_aarch64.whl"}
+torchcodec = {index = "pytorch"}
+
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu118"
+explicit = true
+
+[tool.uv]
+build-constraint-dependencies = ["Cython<3"]
+no-binary-package = ["scikit-learn"]
