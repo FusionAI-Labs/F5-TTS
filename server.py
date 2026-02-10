@@ -33,7 +33,7 @@ class CallRequest(BaseModel):
     message: str
     nfe_step: int = 6
     output_path: str = "./out.wav"
-    ref_audio: str = srt(ref_audio)
+    ref_audio: str = str(ref_audio)
     ref_text: str = ref_text
     speed: float = 1.0
 
