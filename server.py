@@ -33,11 +33,9 @@ class CallRequest(BaseModel):
     message: str
     nfe_step: int = 6
     output_path: str = "./out.wav"
-    ref_audio: str = ref_audio
+    ref_audio: str = srt(ref_audio)
     ref_text: str = ref_text
     speed: float = 1.0
-
-#model_path = "/home/fusionailabs/.cache/huggingface/hub/models--SWivid--F5-TTS/snapshots/84e5a410d9cead4de2f847e7c9369a6440bdfaca/F5TTS_v1_Base/model_1250000.safetensors"
 
 HF_HOME = Path(os.getenv("HF_HOME", Path.home() / ".cache" / "huggingface"))
 snapshots = (HF_HOME / "hub" / "models--SWivid--F5-TTS" / "snapshots")
@@ -59,11 +57,12 @@ n_fft = 1024
 win_length = 1024
 
 def load_checkpoint(model, ckpt_path, device: str, dtype, use_ema=True):
+    ckpt_path = Path(ckpt_path)
 
     model = model.to(dtype)
 
-    ckpt_type = ckpt_path.split(".")[-1]
-    checkpoint = load_file(ckpt_path, device=device)
+    ckpt_type = ckpt_path.suffix.lstrip(".")
+    checkpoint = load_file(str(ckpt_path), device=device)
 
     checkpoint = {"ema_model_state_dict": checkpoint}
     checkpoint["model_state_dict"] = {
