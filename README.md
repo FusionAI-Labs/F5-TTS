@@ -1,3 +1,79 @@
+## Fork notes (Jetson / Demo-oriented)
+
+This repository is a fork of the original [SWivid/F5-TTS](https://github.com/SWivid/F5-TTS) with a small set of practical changes aimed at running as a demo service on NVIDIA Jetson Orin NX 16GB.
+
+### Key differences from upstream
+- **Jetson-compatible PyTorch stack**  
+  Uses prebuilt PyTorch / Torchaudio wheels for JetPack 5.1.1 (Ubuntu 20.04, CUDA on aarch64).
+
+- **Server mode (FastAPI)**  
+  Adds a simple FastAPI server (`server.py`) to run F5-TTS as an HTTP service instead of only CLI/Gradio.
+
+These changes are intentionally minimal and do not modify the core F5-TTS model architecture or inference logic.
+
+---
+
+## Installation
+
+```bash
+git clone https://github.com/<your-org-or-user>/F5-TTS.git
+cd F5-TTS
+uv sync
+````
+## Model requirement (important)
+
+The **F5-TTS model checkpoint must be downloaded in advance** and present in the local
+Hugging Face cache:
+
+```
+~/.cache/huggingface/hub/models--SWivid--F5-TTS/
+```
+
+The server does **not** automatically download the main F5-TTS model.
+Only the Vocos vocoder is downloaded automatically at runtime.
+
+You can populate the cache by running any standard Hugging Face download
+or by following the instructions from the upstream F5-TTS repository.
+
+---
+
+## Running the server
+
+```bash
+uv run uvicorn server:app --host 0.0.0.0 --port 8000
+```
+
+Once running, the service exposes:
+
+* `GET /health`
+* `POST /call` (writes generated audio to disk)
+
+## Example request
+
+Generate speech and save the output WAV file to disk:
+
+```bash
+curl -X POST http://localhost:8000/call \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Hello, this is a test request.",
+    "output_path": "/home/fusionailabs/test.wav"
+  }'
+````
+
+After the request completes, the generated audio will be written to:
+
+```bash
+/home/fusionailabs/test.wav
+```
+
+Optional parameters:
+
+* `nfe_step` (int): number of inference steps (default: 6)
+* `speed` (float): speech speed multiplier (default: 1.0)
+* `ref_audio` (string): path to reference audio file
+* `ref_text` (string): transcript of the reference audio
+
 # F5-TTS: A Fairytaler that Fakes Fluent and Faithful Speech with Flow Matching
 
 [![python](https://img.shields.io/badge/Python-3.10-brightgreen)](https://github.com/SWivid/F5-TTS)
